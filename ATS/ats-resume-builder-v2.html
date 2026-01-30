@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web-Based ATS-Friendly Resume Creation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a67bbd 0%, #42cca0 100%);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .login-screen h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-small {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .app-container {
+            display: none;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .editor-panel, .preview-panel {
+            background: rgba(255, 255, 255, 0.97);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .editor-panel {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .dynamic-section {
+            background: #f9fafb;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border-left: 3px solid #2563eb;
+        }
+
+        .dynamic-section h4 {
+            color: #374151;
+            margin-bottom: 10px;
+        }
+
+        .btn-add {
+            background: #10b981;
+            margin-top: 10px;
+        }
+
+        .btn-add:hover {
+            background: #059669;
+        }
+
+        /* Template Editor */
+        .template-editor-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-top: 10px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .template-editor-btn:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #653a91 100%);
+        }
+
+        .template-editor-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            overflow-y: auto;
+        }
+
+        .template-editor-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .template-editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .close-editor {
+            color: #999;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .close-editor:hover {
+            color: #000;
+        }
+
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .editor-section {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .editor-section h3 {
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .color-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .color-input-group input[type="color"] {
+            width: 50px;
+            height: 40px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .color-input-group label {
+            flex: 1;
+            margin: 0;
+        }
+
+        .color-input-group select {
+            flex: 1;
+        }
+
+        .template-preview-live {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #bfdbfe;
+            margin-top: 20px;
+            min-height: 200px;
+        }
+
+        .template-preview-live h1 {
+            margin: 0 0 10px 0;
+        }
+
+        .template-preview-live h2 {
+            margin: 15px 0 8px 0;
+        }
+
+        @media (max-width: 768px) {
+            .editor-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Resume Preview Base */
+        .resume-preview {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border: 1px solid #e5e7eb;
+            color: #000;
+            line-height: 1.5;
+        }
+
+        /* Template 1: Classic Professional */
+        .template1 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template1 h1 {
+            font-size: 24px;
+            color: #000;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .template1 h2 {
+            font-size: 16px;
+            color: #000;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #000;
+            padding-bottom: 3px;
+        }
+
+        .template1 h3 {
+            font-size: 14px;
+            color: #000;
+            margin-top: 10px;
+            margin-bottom: 3px;
+        }
+
+        /* Template 2: Modern Minimal */
+        .template2 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template2 h1 {
+            font-size: 28px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .template2 h2 {
+            font-size: 14px;
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+
+        .template2 .contact-info {
+            color: #666;
+        }
+
+        .template2 h3 {
+            font-size: 14px;
+            color: #000;
+            margin-top: 10px;
+            margin-bottom: 3px;
+        }
+
+        /* Template 3: Executive Bold */
+        .template3 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template3 h1 {
+            font-size: 32px;
+            color: #000;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .template3 h2 {
+            font-size: 18px;
+            color: #000;
+            margin-top: 18px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-bottom: 3px solid #000;
+            padding-bottom: 4px;
+        }
+
+        .template3 h3 {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        /* Template 4: Technical Focus */
+        .template4 {
+            font-family: 'Courier New', monospace;
+        }
+
+        .template4 h1 {
+            font-size: 26px;
+            color: #000;
+            margin-bottom: 5px;
+            font-family: Arial, sans-serif;
+            text-transform: uppercase;
+        }
+
+        .template4 h2 {
+            font-size: 15px;
+            color: #000;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-family: Arial, sans-serif;
+            text-transform: uppercase;
+            background: #f0f0f0;
+            padding: 5px;
+        }
+
+        .template4 h3 {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        /* Template 5: Creative Professional */
+        .template5 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template5 h1 {
+            font-size: 30px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-style: italic;
+            font-weight: 600;
+        }
+
+        .template5 h2 {
+            font-size: 16px;
+            color: #2c3e50;
+            margin-top: 18px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            border-left: 4px solid #2c3e50;
+            padding-left: 10px;
+        }
+
+        .template5 .contact-info {
+            color: #555;
+            font-style: italic;
+        }
+
+        .template5 h3 {
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        /* Template 6: Academic */
+        .template6 {
+            font-family: 'Times New Roman', serif;
+        }
+
+        .template6 h1 {
+            font-size: 26px;
+            color: #000;
+            margin-bottom: 5px;
+            text-align: center;
+            font-weight: normal;
+        }
+
+        .template6 h2 {
+            font-size: 14px;
+            color: #000;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+            font-weight: bold;
+        }
+
+        .template6 .contact-info {
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .template6 h3 {
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* Template 7: Sales Driven */
+        .template7 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template7 h1 {
+            font-size: 28px;
+            color: #000;
+            margin-bottom: 5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .template7 h2 {
+            font-size: 16px;
+            color: #fff;
+            background: #000;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            font-weight: 700;
+        }
+
+        .template7 h3 {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* Template 8: Compact Efficient */
+        .template8 {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            line-height: 1.4;
+        }
+
+        .template8 h1 {
+            font-size: 22px;
+            color: #000;
+            margin-bottom: 3px;
+            font-weight: 700;
+        }
+
+        .template8 h2 {
+            font-size: 13px;
+            color: #000;
+            margin-top: 12px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-bottom: 1px solid #000;
+        }
+
+        .template8 p, .template8 ul {
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .template8 .contact-info {
+            font-size: 10px;
+        }
+
+        .template8 h3 {
+            font-size: 12px;
+        }
+
+        /* Template 9: Skills Highlight */
+        .template9 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template9 h1 {
+            font-size: 26px;
+            color: #000;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            border-bottom: 3px solid #000;
+            padding-bottom: 5px;
+        }
+
+        .template9 h2 {
+            font-size: 15px;
+            color: #000;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .template9 h2:before {
+            content: "▶ ";
+            color: #000;
+        }
+
+        .template9 h3 {
+            font-size: 14px;
+        }
+
+        /* Template 10: Two-Tone */
+        .template10 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template10 h1 {
+            font-size: 26px;
+            color: #000;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            background: #f8f8f8;
+            padding: 10px;
+            border-left: 5px solid #000;
+        }
+
+        .template10 h2 {
+            font-size: 15px;
+            color: #000;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: #f0f0f0;
+            padding: 5px 8px;
+        }
+
+        .template10 h3 {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        /* Template 11: Blue Accent */
+        .template11 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template11 h1 {
+            font-size: 28px;
+            color: #0066cc;
+            margin-bottom: 5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .template11 h2 {
+            font-size: 14px;
+            color: #fff;
+            background: #0066cc;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            font-weight: 700;
+        }
+
+        .template11 h3 {
+            font-size: 13px;
+            color: #0066cc;
+            font-weight: 700;
+        }
+
+        /* Template 12: Green Minimal */
+        .template12 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template12 h1 {
+            font-size: 26px;
+            color: #27ae60;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .template12 h2 {
+            font-size: 14px;
+            color: #27ae60;
+            margin-top: 18px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            border-bottom: 2px solid #27ae60;
+            padding-bottom: 4px;
+        }
+
+        .template12 h3 {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Template 13: Dark Professional */
+        .template13 {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a !important;
+            color: #e0e0e0;
+        }
+
+        .template13 h1 {
+            font-size: 30px;
+            color: #fff;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .template13 h2 {
+            font-size: 15px;
+            color: #4CAF50;
+            margin-top: 18px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .template13 h3 {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .template13 p, .template13 ul {
+            color: #d0d0d0;
+        }
+
+        /* Template 14: Red Accent */
+        .template14 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template14 h1 {
+            font-size: 28px;
+            color: #d32f2f;
+            margin-bottom: 5px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .template14 h2 {
+            font-size: 14px;
+            color: #d32f2f;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            border-left: 4px solid #d32f2f;
+            padding-left: 10px;
+            font-weight: 700;
+        }
+
+        .template14 h3 {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* Template 15: Orange Warm */
+        .template15 {
+            font-family: 'Georgia', serif;
+        }
+
+        .template15 h1 {
+            font-size: 30px;
+            color: #ff6f00;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .template15 h2 {
+            font-size: 16px;
+            color: #ff6f00;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            border-bottom: 3px solid #ff6f00;
+            padding-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .template15 h3 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Template 16: Purple Elegant */
+        .template16 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template16 h1 {
+            font-size: 32px;
+            color: #6a1b9a;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .template16 h2 {
+            font-size: 14px;
+            color: #6a1b9a;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #6a1b9a;
+            padding-bottom: 4px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .template16 h3 {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* Template 17: Teal Modern */
+        .template17 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template17 h1 {
+            font-size: 26px;
+            color: #00796b;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .template17 h2 {
+            font-size: 13px;
+            color: #fff;
+            background: #00796b;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            padding: 8px 10px;
+            font-weight: 700;
+        }
+
+        .template17 h3 {
+            font-size: 13px;
+            color: #00796b;
+            font-weight: 700;
+        }
+
+        /* Template 18: Indigo Professional */
+        .template18 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template18 h1 {
+            font-size: 28px;
+            color: #3f51b5;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .template18 h2 {
+            font-size: 14px;
+            color: #3f51b5;
+            margin-top: 18px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            border-bottom: 3px solid #3f51b5;
+            padding-bottom: 5px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .template18 h3 {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Template 19: Slate Gray */
+        .template19 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template19 h1 {
+            font-size: 26px;
+            color: #455a64;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .template19 h2 {
+            font-size: 14px;
+            color: #455a64;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            background: #eceff1;
+            padding: 6px 10px;
+            font-weight: 700;
+            border-left: 3px solid #455a64;
+        }
+
+        .template19 h3 {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* Template 20: Pink Gradient */
+        .template20 {
+            font-family: Arial, sans-serif;
+        }
+
+        .template20 h1 {
+            font-size: 28px;
+            color: #c2185b;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .template20 h2 {
+            font-size: 14px;
+            color: #c2185b;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            border-bottom: 2px dashed #c2185b;
+            padding-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .template20 h3 {
+            font-size: 13px;
+            color: #c2185b;
+            font-weight: 700;
+        }
+
+        /* Common styles for all templates */
+        .resume-preview p, .resume-preview ul {
+            font-size: 12px;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .resume-preview ul {
+            list-style-position: inside;
+            padding-left: 0;
+        }
+
+        .resume-preview .contact-info {
+            font-size: 11px;
+            margin-bottom: 15px;
+        }
+
+        .resume-preview .job-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .resume-preview .date {
+            font-style: italic;
+            font-size: 11px;
+        }
+
+        /* ATS Score */
+        .ats-score {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .score-display {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+
+        .score-breakdown {
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .score-breakdown div {
+            margin-bottom: 5px;
+        }
+
+        .keywords-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #bfdbfe;
+        }
+
+        .keyword-tag {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 4px 12px;
+            border-radius: 12px;
+            margin: 4px;
+            font-size: 12px;
+        }
+
+        .export-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .export-buttons button {
+            flex: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .role-selector {
+            margin-bottom: 20px;
+        }
+
+        .template-preview {
+            background: #f9fafb;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Template Editor Modal -->
+    <div id="templateEditorModal" class="template-editor-modal">
+        <div class="template-editor-content">
+            <div class="template-editor-header">
+                <h2>✨ Create Custom Resume Template</h2>
+                <button class="close-editor" onclick="closeTemplateEditor()">&times;</button>
+            </div>
+
+            <div class="editor-grid">
+                <div>
+                    <div class="editor-section">
+                        <h3>Header Styling</h3>
+                        <div class="color-input-group">
+                            <label>Header Color:</label>
+                            <input type="color" id="headerColor" value="#000000" oninput="updateTemplateLivePreview()">
+                        </div>
+                        <div class="color-input-group">
+                            <label>Header Size:</label>
+                            <select id="headerSize" oninput="updateTemplateLivePreview()">
+                                <option value="24">Small (24px)</option>
+                                <option value="28" selected>Medium (28px)</option>
+                                <option value="32">Large (32px)</option>
+                                <option value="36">Extra Large (36px)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="editor-section" style="margin-top: 15px;">
+                        <h3>Section Headers</h3>
+                        <div class="color-input-group">
+                            <label>Section Color:</label>
+                            <input type="color" id="sectionColor" value="#000000" oninput="updateTemplateLivePreview()">
+                        </div>
+                        <div class="color-input-group">
+                            <label>Border Style:</label>
+                            <select id="borderStyle" oninput="updateTemplateLivePreview()">
+                                <option value="border-bottom">Bottom Border</option>
+                                <option value="border-left" selected>Left Border</option>
+                                <option value="background">Background Color</option>
+                                <option value="underline">Underline</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="editor-section" style="margin-top: 15px;">
+                        <h3>Background</h3>
+                        <div class="color-input-group">
+                            <label>Background Color:</label>
+                            <input type="color" id="bgColor" value="#ffffff" oninput="updateTemplateLivePreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="editor-section">
+                        <h3>Font Settings</h3>
+                        <div class="color-input-group">
+                            <label>Font Family:</label>
+                            <select id="fontFamily" oninput="updateTemplateLivePreview()">
+                                <option value="Arial" selected>Arial</option>
+                                <option value="'Times New Roman'">Times New Roman</option>
+                                <option value="'Courier New'">Courier New</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Verdana">Verdana</option>
+                            </select>
+                        </div>
+                        <div class="color-input-group">
+                            <label>Text Color:</label>
+                            <input type="color" id="textColor" value="#000000" oninput="updateTemplateLivePreview()">
+                        </div>
+                    </div>
+
+                    <div class="editor-section" style="margin-top: 15px;">
+                        <h3>Spacing & Padding</h3>
+                        <div class="color-input-group">
+                            <label>Line Height:</label>
+                            <select id="lineHeight" oninput="updateTemplateLivePreview()">
+                                <option value="1.4">Compact (1.4)</option>
+                                <option value="1.6" selected>Normal (1.6)</option>
+                                <option value="1.8">Comfortable (1.8)</option>
+                                <option value="2">Spacious (2)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="editor-section" style="margin-top: 15px;">
+                        <h3>Template Name</h3>
+                        <input type="text" id="templateName" placeholder="e.g., My Custom Template" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: Arial;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="template-preview-live" id="templatePreviewLive">
+                <h1 style="color: #000000; font-size: 28px; font-family: Arial;">YOUR NAME</h1>
+                <div style="color: #666; font-size: 12px; margin-bottom: 15px;">email@example.com | Phone | City, State</div>
+                <h2 style="color: #000000; font-size: 16px; font-family: Arial; border-bottom: 2px solid #000000; padding-bottom: 5px;">PROFESSIONAL SUMMARY</h2>
+                <p style="font-family: Arial; color: #000000;">Your professional summary will appear here with your qualifications and experience.</p>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button onclick="saveCustomTemplate()" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: 600;">Save Custom Template</button>
+                <button onclick="closeTemplateEditor()" class="btn-secondary" style="flex: 1; padding: 12px;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <h1>Web-Based ATS-Friendly Resume Creation System</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">Choose from 20 Professional Templates</p>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter your password">
+        </div>
+        <button onclick="login()">Login</button>
+        <button class="btn-secondary" onclick="register()">Register</button>
+    </div>
+
+    <!-- Main App -->
+    <div id="appContainer" class="app-container">
+        <div class="container">
+            <div class="header">
+                <h1>Web-Based ATS-Friendly Resume Creation System</h1>
+                <div class="user-info">
+                    <span id="userEmail"></span>
+                    <button class="btn-small btn-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <!-- Editor Panel -->
+                <div class="editor-panel">
+                    <div class="role-selector">
+                        <label>Choose Resume Template</label>
+                        <select id="templateSelector" onchange="changeTemplate()">
+                            <option value="template1">Template 1: Classic Professional</option>
+                            <option value="template2">Template 2: Modern Minimal</option>
+                            <option value="template3">Template 3: Executive Bold</option>
+                            <option value="template4">Template 4: Technical Focus</option>
+                            <option value="template5">Template 5: Creative Professional</option>
+                            <option value="template6">Template 6: Academic</option>
+                            <option value="template7">Template 7: Sales Driven</option>
+                            <option value="template8">Template 8: Compact Efficient</option>
+                            <option value="template9">Template 9: Skills Highlight</option>
+                            <option value="template10">Template 10: Two-Tone</option>
+                            <option value="template11">Template 11: Blue Accent</option>
+                            <option value="template12">Template 12: Green Minimal</option>
+                            <option value="template13">Template 13: Dark Professional</option>
+                            <option value="template14">Template 14: Red Accent</option>
+                            <option value="template15">Template 15: Orange Warm</option>
+                            <option value="template16">Template 16: Purple Elegant</option>
+                            <option value="template17">Template 17: Teal Modern</option>
+                            <option value="template18">Template 18: Indigo Professional</option>
+                            <option value="template19">Template 19: Slate Gray</option>
+                            <option value="template20">Template 20: Pink Gradient</option>
+                        </select>
+                        <div class="template-preview" id="templateDescription">
+                            Clean, professional layout with traditional section headers. Perfect for corporate roles.
+                        </div>
+                    </div>
+
+                    <div class="role-selector">
+                        <label>Target Job Role (for keyword suggestions)</label>
+                        <select id="jobRole" onchange="updateKeywordSuggestions()">
+                            <option value="">Select a role...</option>
+                            <option value="software-engineer">Software Engineer</option>
+                            <option value="data-scientist">Data Scientist</option>
+                            <option value="product-manager">Product Manager</option>
+                            <option value="ux-designer">UX/UI Designer</option>
+                            <option value="marketing-manager">Marketing Manager</option>
+                            <option value="sales-executive">Sales Executive</option>
+                            <option value="accountant">Accountant</option>
+                            <option value="hr-manager">HR Manager</option>
+                        </select>
+                    </div>
+
+                    <!-- Personal Details -->
+                    <div class="section">
+                        <h2>Personal Details</h2>
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" id="fullName" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="email" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone *</label>
+                            <input type="tel" id="phone" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Location (City, State)</label>
+                            <input type="text" id="location" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>LinkedIn</label>
+                            <input type="url" id="linkedin" oninput="updatePreview()">
+                        </div>
+                    </div>
+
+                    <!-- Professional Summary -->
+                    <div class="section">
+                        <h2>Professional Summary</h2>
+                        <div class="form-group">
+                            <label>Summary *</label>
+                            <textarea id="summary" placeholder="Brief professional summary highlighting your key skills and experience" oninput="updatePreview()"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Skills -->
+                    <div class="section">
+                        <h2>Skills</h2>
+                        <div class="form-group">
+                            <label>Technical Skills (comma-separated) *</label>
+                            <textarea id="skills" placeholder="e.g., JavaScript, React, Node.js, Python, SQL" oninput="updatePreview()"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Experience -->
+                    <div class="section">
+                        <h2>Work Experience</h2>
+                        <div id="experienceContainer"></div>
+                        <button class="btn-add btn-small" onclick="addExperience()">+ Add Experience</button>
+                    </div>
+
+                    <!-- Education -->
+                    <div class="section">
+                        <h2>Education</h2>
+                        <div id="educationContainer"></div>
+                        <button class="btn-add btn-small" onclick="addEducation()">+ Add Education</button>
+                    </div>
+
+                    <!-- Projects -->
+                    <div class="section">
+                        <h2>Projects</h2>
+                        <div id="projectsContainer"></div>
+                        <button class="btn-add btn-small" onclick="addProject()">+ Add Project</button>
+                    </div>
+
+                    <!-- Certifications -->
+                    <div class="section">
+                        <h2>Certifications</h2>
+                        <div id="certificationsContainer"></div>
+                        <button class="btn-add btn-small" onclick="addCertification()">+ Add Certification</button>
+                    </div>
+
+                    <button onclick="saveResume()">Save Resume</button>
+                    <button class="btn-secondary" onclick="loadSampleResume()">Load Sample Resume</button>
+                    <button class="template-editor-btn" onclick="openTemplateEditor()">✨ Create Custom Template</button>
+                </div>
+
+                <!-- Preview Panel -->
+                <div class="preview-panel">
+                    <!-- ATS Score -->
+                    <div class="ats-score">
+                        <div class="score-display" id="atsScore">0%</div>
+                        <div class="score-breakdown" id="scoreBreakdown"></div>
+                        <div class="keywords-section">
+                            <strong>Suggested Keywords for Your Role:</strong>
+                            <div id="keywordSuggestions"></div>
+                        </div>
+                    </div>
+
+                    <!-- Export Buttons -->
+                    <div class="export-buttons">
+                        <button onclick="exportToPDF()">Export to PDF</button>
+                        <button class="btn-secondary" onclick="exportToWord()">Export to DOCX</button>
+                    </div>
+
+                    <!-- Resume Preview -->
+                    <div class="resume-preview template1" id="resumePreview">
+                        <h1 id="previewName">YOUR NAME</h1>
+                        <div class="contact-info" id="previewContact">
+                            Email | Phone | Location | LinkedIn
+                        </div>
+
+                        <h2>PROFESSIONAL SUMMARY</h2>
+                        <p id="previewSummary">Your professional summary will appear here...</p>
+
+                        <h2>SKILLS</h2>
+                        <p id="previewSkills">Your skills will appear here...</p>
+
+                        <h2>WORK EXPERIENCE</h2>
+                        <div id="previewExperience"></div>
+
+                        <h2>EDUCATION</h2>
+                        <div id="previewEducation"></div>
+
+                        <h2>PROJECTS</h2>
+                        <div id="previewProjects"></div>
+
+                        <h2>CERTIFICATIONS</h2>
+                        <div id="previewCertifications"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <script>
+        let currentUser = null;
+        let experienceCount = 0;
+        let educationCount = 0;
+        let projectCount = 0;
+        let certificationCount = 0;
+
+        const templateDescriptions = {
+            template1: 'Clean, professional layout with traditional section headers. Perfect for corporate roles.',
+            template2: 'Sleek, modern design with subtle styling. Great for tech and creative industries.',
+            template3: 'Bold, confident layout with strong typography. Ideal for executive and leadership positions.',
+            template4: 'Technical-focused design with monospace font. Perfect for developers and engineers.',
+            template5: 'Creative professional style with distinctive headers. Best for design and creative roles.',
+            template6: 'Traditional academic format with centered name. Ideal for research and academic positions.',
+            template7: 'Dynamic, high-impact design with bold sections. Perfect for sales and business development.',
+            template8: 'Space-efficient compact layout. Great when you need to fit more content.',
+            template9: 'Skills-forward design with arrow indicators. Highlights technical competencies.',
+            template10: 'Two-tone professional style with subtle backgrounds. Modern and distinctive.',
+            template11: 'Professional blue accent design. Perfect for finance, consulting, and corporate roles.',
+            template12: 'Clean green minimalist layout. Ideal for environmental, health, and non-profit sectors.',
+            template13: 'Sophisticated dark theme with bright accents. Great for tech and creative professionals.',
+            template14: 'Bold red accent design. Perfect for marketing, sales, and entrepreneurial roles.',
+            template15: 'Warm orange serif design. Excellent for creative, design, and agency positions.',
+            template16: 'Elegant purple layout with premium feel. Great for senior and executive roles.',
+            template17: 'Modern teal design with clean headers. Perfect for tech and startup environments.',
+            template18: 'Professional indigo layout with premium styling. Great for finance and consulting.',
+            template19: 'Sophisticated slate gray design. Perfect for engineering and technical roles.',
+            template20: 'Eye-catching pink gradient design. Great for creative, fashion, and design industries.'
+        };
+
+        const keywordsByRole = {
+            'software-engineer': ['JavaScript', 'Python', 'Java', 'React', 'Node.js', 'AWS', 'Docker', 'Kubernetes', 'Git', 'CI/CD', 'Agile', 'REST API', 'Microservices', 'SQL', 'MongoDB'],
+            'data-scientist': ['Python', 'R', 'Machine Learning', 'Deep Learning', 'TensorFlow', 'PyTorch', 'SQL', 'Data Visualization', 'Statistics', 'Pandas', 'NumPy', 'Scikit-learn', 'Tableau', 'Big Data', 'A/B Testing'],
+            'product-manager': ['Product Strategy', 'Roadmap', 'Agile', 'Scrum', 'User Stories', 'A/B Testing', 'Analytics', 'Stakeholder Management', 'Market Research', 'Product Launch', 'KPIs', 'User Experience', 'Competitive Analysis'],
+            'ux-designer': ['Figma', 'Sketch', 'Adobe XD', 'Wireframing', 'Prototyping', 'User Research', 'Usability Testing', 'Information Architecture', 'Design Systems', 'Interaction Design', 'User-Centered Design', 'HTML/CSS'],
+            'marketing-manager': ['Digital Marketing', 'SEO', 'SEM', 'Content Marketing', 'Social Media', 'Google Analytics', 'Campaign Management', 'Email Marketing', 'Brand Strategy', 'Marketing Automation', 'ROI Analysis', 'Lead Generation'],
+            'sales-executive': ['B2B Sales', 'CRM', 'Salesforce', 'Account Management', 'Lead Generation', 'Negotiation', 'Pipeline Management', 'Sales Strategy', 'Customer Relationship', 'Revenue Growth', 'Prospecting'],
+            'accountant': ['GAAP', 'Financial Reporting', 'Tax Preparation', 'QuickBooks', 'Excel', 'Accounts Payable', 'Accounts Receivable', 'Reconciliation', 'Audit', 'Budgeting', 'Forecasting', 'CPA'],
+            'hr-manager': ['Recruitment', 'Talent Acquisition', 'Employee Relations', 'HRIS', 'Performance Management', 'Compensation', 'Benefits Administration', 'Training & Development', 'Compliance', 'Onboarding', 'HR Policies']
+        };
+
+        function changeTemplate() {
+            const template = document.getElementById('templateSelector').value;
+            const preview = document.getElementById('resumePreview');
+            
+            // Remove all template classes
+            preview.className = 'resume-preview';
+            
+            // Add selected template class
+            preview.classList.add(template);
+            
+            // Update description
+            document.getElementById('templateDescription').textContent = templateDescriptions[template];
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            
+            if (users[email] && users[email].password === password) {
+                currentUser = email;
+                document.getElementById('userEmail').textContent = email;
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('appContainer').style.display = 'block';
+                loadResume();
+            } else {
+                alert('Invalid credentials');
+            }
+        }
+
+        function register() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            
+            if (users[email]) {
+                alert('User already exists. Please login.');
+                return;
+            }
+
+            users[email] = { password: password };
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('Registration successful! Please login.');
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function addExperience() {
+            experienceCount++;
+            const container = document.getElementById('experienceContainer');
+            const div = document.createElement('div');
+            div.className = 'dynamic-section';
+            div.innerHTML = `
+                <h4>Experience ${experienceCount}</h4>
+                <div class="form-group">
+                    <label>Job Title</label>
+                    <input type="text" id="expTitle${experienceCount}" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Company</label>
+                    <input type="text" id="expCompany${experienceCount}" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Duration (e.g., Jan 2020 - Dec 2022)</label>
+                    <input type="text" id="expDuration${experienceCount}" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Responsibilities (one per line)</label>
+                    <textarea id="expDesc${experienceCount}" oninput="updatePreview()"></textarea>
+                </div>
+                <button class="btn-danger btn-small" onclick="this.parentElement.remove(); updatePreview()">Remove</button>
+            `;
+            container.appendChild(div);
+            updatePreview();
+        }
+
+        function addEducation() {
+            educationCount++;
+            const container = document.getElementById('educationContainer');
+            const div = document.createElement('div');
+            div.className = 'dynamic-section';
+            div.innerHTML = `
+                <h4>Education ${educationCount}</h4>
+                <div class="form-group">
+                    <label>Degree</label>
+                    <input type="text" id="eduDegree${educationCount}" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Institution</label>
+                    <input type="text" id="eduInstitution${educationCount}" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Year</label>
+                    <input type="text" id="eduYear${educationCount}" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>GPA (optional)</label>
+                    <input type="text" id="eduGPA${educationCount}" oninput="updatePreview()">
+                </div>
+                <button class="btn-danger btn-small" onclick="this.parentElement.remove(); updatePreview()">Remove</button>
+            `;
+            container.appendChild(div);
+            updatePreview();
+        }
+
+        function addProject() {
+            projectCount++;
+            const container = document.getElementById('projectsContainer');
+            const div = document.createElement('div');
+            div.className = 'dynamic-section';
+            div.innerHTML = `
+                <h4>Project ${projectCount}</h4>
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" id="projName${projectCount}" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Technologies Used</label>
+                    <input type="text" id="projTech${projectCount}" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="projDesc${projectCount}" oninput="updatePreview()"></textarea>
+                </div>
+                <button class="btn-danger btn-small" onclick="this.parentElement.remove(); updatePreview()">Remove</button>
+            `;
+            container.appendChild(div);
+            updatePreview();
+        }
+
+        function addCertification() {
+            certificationCount++;
+            const container = document.getElementById('certificationsContainer');
+            const div = document.createElement('div');
+            div.className = 'dynamic-section';
+            div.innerHTML = `
+                <h4>Certification ${certificationCount}</h4>
+                <div class="form-group">
+                    <label>Certification Name</label>
+                    <input type="text" id="certName${certificationCount}" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Issuing Organization</label>
+                    <input type="text" id="certOrg${certificationCount}" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Year</label>
+                    <input type="text" id="certYear${certificationCount}" oninput="updatePreview()">
+                </div>
+                <button class="btn-danger btn-small" onclick="this.parentElement.remove(); updatePreview()">Remove</button>
+            `;
+            container.appendChild(div);
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const fullName = document.getElementById('fullName').value || 'YOUR NAME';
+            document.getElementById('previewName').textContent = fullName.toUpperCase();
+
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const location = document.getElementById('location').value;
+            const linkedin = document.getElementById('linkedin').value;
+
+            let contactParts = [];
+            if (email) contactParts.push(email);
+            if (phone) contactParts.push(phone);
+            if (location) contactParts.push(location);
+            if (linkedin) contactParts.push(linkedin);
+
+            document.getElementById('previewContact').textContent = contactParts.join(' | ') || 'Contact information will appear here';
+
+            document.getElementById('previewSummary').textContent = document.getElementById('summary').value || 'Your professional summary will appear here...';
+
+            document.getElementById('previewSkills').textContent = document.getElementById('skills').value || 'Your skills will appear here...';
+
+            let expHTML = '';
+            for (let i = 1; i <= experienceCount; i++) {
+                const title = document.getElementById(`expTitle${i}`)?.value;
+                const company = document.getElementById(`expCompany${i}`)?.value;
+                const duration = document.getElementById(`expDuration${i}`)?.value;
+                const desc = document.getElementById(`expDesc${i}`)?.value;
+
+                if (title || company) {
+                    expHTML += `
+                        <div style="margin-bottom: 15px;">
+                            <div class="job-header">
+                                <h3>${title || 'Job Title'}</h3>
+                                <span class="date">${duration || ''}</span>
+                            </div>
+                            <p style="font-weight: bold; margin-bottom: 5px;">${company || 'Company Name'}</p>
+                            ${desc ? `<ul>${desc.split('\n').filter(d => d.trim()).map(d => `<li>${d.trim()}</li>`).join('')}</ul>` : ''}
+                        </div>
+                    `;
+                }
+            }
+            document.getElementById('previewExperience').innerHTML = expHTML || '<p>Your work experience will appear here...</p>';
+
+            let eduHTML = '';
+            for (let i = 1; i <= educationCount; i++) {
+                const degree = document.getElementById(`eduDegree${i}`)?.value;
+                const institution = document.getElementById(`eduInstitution${i}`)?.value;
+                const year = document.getElementById(`eduYear${i}`)?.value;
+                const gpa = document.getElementById(`eduGPA${i}`)?.value;
+
+                if (degree || institution) {
+                    eduHTML += `
+                        <div style="margin-bottom: 10px;">
+                            <div class="job-header">
+                                <h3>${degree || 'Degree'}</h3>
+                                <span class="date">${year || ''}</span>
+                            </div>
+                            <p>${institution || 'Institution'}</p>
+                            ${gpa ? `<p>GPA: ${gpa}</p>` : ''}
+                        </div>
+                    `;
+                }
+            }
+            document.getElementById('previewEducation').innerHTML = eduHTML || '<p>Your education will appear here...</p>';
+
+            let projHTML = '';
+            for (let i = 1; i <= projectCount; i++) {
+                const name = document.getElementById(`projName${i}`)?.value;
+                const tech = document.getElementById(`projTech${i}`)?.value;
+                const desc = document.getElementById(`projDesc${i}`)?.value;
+
+                if (name) {
+                    projHTML += `
+                        <div style="margin-bottom: 10px;">
+                            <h3>${name}</h3>
+                            ${tech ? `<p><strong>Technologies:</strong> ${tech}</p>` : ''}
+                            ${desc ? `<p>${desc}</p>` : ''}
+                        </div>
+                    `;
+                }
+            }
+            document.getElementById('previewProjects').innerHTML = projHTML || '<p>Your projects will appear here...</p>';
+
+            let certHTML = '';
+            for (let i = 1; i <= certificationCount; i++) {
+                const name = document.getElementById(`certName${i}`)?.value;
+                const org = document.getElementById(`certOrg${i}`)?.value;
+                const year = document.getElementById(`certYear${i}`)?.value;
+
+                if (name) {
+                    certHTML += `
+                        <div style="margin-bottom: 8px;">
+                            <p><strong>${name}</strong> - ${org || 'Organization'} ${year ? `(${year})` : ''}</p>
+                        </div>
+                    `;
+                }
+            }
+            document.getElementById('previewCertifications').innerHTML = certHTML || '<p>Your certifications will appear here...</p>';
+
+            calculateATSScore();
+        }
+
+        function calculateATSScore() {
+            let score = 0;
+            let breakdown = [];
+
+            const requiredFields = [
+                { id: 'fullName', points: 10, name: 'Full Name' },
+                { id: 'email', points: 5, name: 'Email' },
+                { id: 'phone', points: 5, name: 'Phone' },
+                { id: 'summary', points: 10, name: 'Professional Summary' },
+                { id: 'skills', points: 10, name: 'Skills' }
+            ];
+
+            requiredFields.forEach(field => {
+                const value = document.getElementById(field.id)?.value;
+                if (value && value.trim()) {
+                    score += field.points;
+                    breakdown.push(`✓ ${field.name}: ${field.points} points`);
+                } else {
+                    breakdown.push(`✗ ${field.name}: Missing (-${field.points} points)`);
+                }
+            });
+
+            let hasExperience = false;
+            for (let i = 1; i <= experienceCount; i++) {
+                if (document.getElementById(`expTitle${i}`)?.value) {
+                    hasExperience = true;
+                    break;
+                }
+            }
+            if (hasExperience) {
+                score += 15;
+                breakdown.push('✓ Work Experience: 15 points');
+            } else {
+                breakdown.push('✗ Work Experience: Missing (-15 points)');
+            }
+
+            let hasEducation = false;
+            for (let i = 1; i <= educationCount; i++) {
+                if (document.getElementById(`eduDegree${i}`)?.value) {
+                    hasEducation = true;
+                    break;
+                }
+            }
+            if (hasEducation) {
+                score += 15;
+                breakdown.push('✓ Education: 15 points');
+            } else {
+                breakdown.push('✗ Education: Missing (-15 points)');
+            }
+
+            const jobRole = document.getElementById('jobRole').value;
+            if (jobRole && keywordsByRole[jobRole]) {
+                const resumeText = document.getElementById('resumePreview').textContent.toLowerCase();
+                const keywords = keywordsByRole[jobRole];
+                const matchedKeywords = keywords.filter(kw => resumeText.includes(kw.toLowerCase()));
+                const keywordScore = Math.min(30, Math.round((matchedKeywords.length / keywords.length) * 30));
+                score += keywordScore;
+                breakdown.push(`✓ Keyword Match: ${matchedKeywords.length}/${keywords.length} keywords (${keywordScore} points)`);
+            }
+
+            document.getElementById('atsScore').textContent = score + '%';
+            document.getElementById('scoreBreakdown').innerHTML = breakdown.map(b => `<div>${b}</div>`).join('');
+
+            const scoreDisplay = document.getElementById('atsScore');
+            if (score >= 80) {
+                scoreDisplay.style.color = '#10b981';
+            } else if (score >= 60) {
+                scoreDisplay.style.color = '#f59e0b';
+            } else {
+                scoreDisplay.style.color = '#dc2626';
+            }
+        }
+
+        function updateKeywordSuggestions() {
+            const jobRole = document.getElementById('jobRole').value;
+            const container = document.getElementById('keywordSuggestions');
+            
+            if (!jobRole || !keywordsByRole[jobRole]) {
+                container.innerHTML = '<p style="font-size: 12px; color: #6b7280;">Select a job role to see keyword suggestions</p>';
+                return;
+            }
+
+            const keywords = keywordsByRole[jobRole];
+            const resumeText = document.getElementById('resumePreview').textContent.toLowerCase();
+            
+            let html = '';
+            keywords.forEach(kw => {
+                const hasKeyword = resumeText.includes(kw.toLowerCase());
+                const style = hasKeyword ? '' : 'opacity: 0.5; background: #f3f4f6; color: #6b7280;';
+                html += `<span class="keyword-tag" style="${style}">${hasKeyword ? '✓ ' : ''}${kw}</span>`;
+            });
+            
+            container.innerHTML = html;
+            updatePreview();
+        }
+
+        function saveResume() {
+            if (!currentUser) return;
+
+            const resumeData = {
+                template: document.getElementById('templateSelector').value,
+                jobRole: document.getElementById('jobRole').value,
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                location: document.getElementById('location').value,
+                linkedin: document.getElementById('linkedin').value,
+                summary: document.getElementById('summary').value,
+                skills: document.getElementById('skills').value,
+                experienceCount: experienceCount,
+                educationCount: educationCount,
+                projectCount: projectCount,
+                certificationCount: certificationCount,
+                experiences: [],
+                education: [],
+                projects: [],
+                certifications: []
+            };
+
+            for (let i = 1; i <= experienceCount; i++) {
+                if (document.getElementById(`expTitle${i}`)) {
+                    resumeData.experiences.push({
+                        title: document.getElementById(`expTitle${i}`).value,
+                        company: document.getElementById(`expCompany${i}`).value,
+                        duration: document.getElementById(`expDuration${i}`).value,
+                        description: document.getElementById(`expDesc${i}`).value
+                    });
+                }
+            }
+
+            for (let i = 1; i <= educationCount; i++) {
+                if (document.getElementById(`eduDegree${i}`)) {
+                    resumeData.education.push({
+                        degree: document.getElementById(`eduDegree${i}`).value,
+                        institution: document.getElementById(`eduInstitution${i}`).value,
+                        year: document.getElementById(`eduYear${i}`).value,
+                        gpa: document.getElementById(`eduGPA${i}`).value
+                    });
+                }
+            }
+
+            for (let i = 1; i <= projectCount; i++) {
+                if (document.getElementById(`projName${i}`)) {
+                    resumeData.projects.push({
+                        name: document.getElementById(`projName${i}`).value,
+                        tech: document.getElementById(`projTech${i}`).value,
+                        description: document.getElementById(`projDesc${i}`).value
+                    });
+                }
+            }
+
+            for (let i = 1; i <= certificationCount; i++) {
+                if (document.getElementById(`certName${i}`)) {
+                    resumeData.certifications.push({
+                        name: document.getElementById(`certName${i}`).value,
+                        org: document.getElementById(`certOrg${i}`).value,
+                        year: document.getElementById(`certYear${i}`).value
+                    });
+                }
+            }
+
+            localStorage.setItem(`resume_${currentUser}`, JSON.stringify(resumeData));
+            alert('Resume saved successfully!');
+        }
+
+        function loadResume() {
+            if (!currentUser) return;
+
+            const savedData = localStorage.getItem(`resume_${currentUser}`);
+            if (!savedData) return;
+
+            const resumeData = JSON.parse(savedData);
+
+            if (resumeData.template) {
+                document.getElementById('templateSelector').value = resumeData.template;
+                changeTemplate();
+            }
+
+            document.getElementById('jobRole').value = resumeData.jobRole || '';
+            document.getElementById('fullName').value = resumeData.fullName || '';
+            document.getElementById('email').value = resumeData.email || '';
+            document.getElementById('phone').value = resumeData.phone || '';
+            document.getElementById('location').value = resumeData.location || '';
+            document.getElementById('linkedin').value = resumeData.linkedin || '';
+            document.getElementById('summary').value = resumeData.summary || '';
+            document.getElementById('skills').value = resumeData.skills || '';
+
+            document.getElementById('experienceContainer').innerHTML = '';
+            document.getElementById('educationContainer').innerHTML = '';
+            document.getElementById('projectsContainer').innerHTML = '';
+            document.getElementById('certificationsContainer').innerHTML = '';
+
+            experienceCount = 0;
+            educationCount = 0;
+            projectCount = 0;
+            certificationCount = 0;
+
+            resumeData.experiences?.forEach(exp => {
+                addExperience();
+                document.getElementById(`expTitle${experienceCount}`).value = exp.title || '';
+                document.getElementById(`expCompany${experienceCount}`).value = exp.company || '';
+                document.getElementById(`expDuration${experienceCount}`).value = exp.duration || '';
+                document.getElementById(`expDesc${experienceCount}`).value = exp.description || '';
+            });
+
+            resumeData.education?.forEach(edu => {
+                addEducation();
+                document.getElementById(`eduDegree${educationCount}`).value = edu.degree || '';
+                document.getElementById(`eduInstitution${educationCount}`).value = edu.institution || '';
+                document.getElementById(`eduYear${educationCount}`).value = edu.year || '';
+                document.getElementById(`eduGPA${educationCount}`).value = edu.gpa || '';
+            });
+
+            resumeData.projects?.forEach(proj => {
+                addProject();
+                document.getElementById(`projName${projectCount}`).value = proj.name || '';
+                document.getElementById(`projTech${projectCount}`).value = proj.tech || '';
+                document.getElementById(`projDesc${projectCount}`).value = proj.description || '';
+            });
+
+            resumeData.certifications?.forEach(cert => {
+                addCertification();
+                document.getElementById(`certName${certificationCount}`).value = cert.name || '';
+                document.getElementById(`certOrg${certificationCount}`).value = cert.org || '';
+                document.getElementById(`certYear${certificationCount}`).value = cert.year || '';
+            });
+
+            updateKeywordSuggestions();
+            updatePreview();
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const resumeText = document.getElementById('resumePreview').innerText;
+            const lines = doc.splitTextToSize(resumeText, 180);
+            
+            doc.setFontSize(12);
+            doc.text(lines, 15, 15);
+            
+            doc.save('resume.pdf');
+        }
+
+        function exportToWord() {
+            const resumeHTML = document.getElementById('resumePreview').innerHTML;
+            const converted = htmlToPlainText(resumeHTML);
+            
+            const blob = new Blob([converted], { 
+                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+            });
+            
+            saveAs(blob, 'resume.docx');
+        }
+
+        function htmlToPlainText(html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            return temp.textContent || temp.innerText || '';
+        }
+
+        function loadSampleResume() {
+            document.getElementById('templateSelector').value = 'template1';
+            changeTemplate();
+            document.getElementById('jobRole').value = 'software-engineer';
+            document.getElementById('fullName').value = 'JOHN SMITH';
+            document.getElementById('email').value = 'john.smith@email.com';
+            document.getElementById('phone').value = '+1-555-123-4567';
+            document.getElementById('location').value = 'San Francisco, CA';
+            document.getElementById('linkedin').value = 'linkedin.com/in/johnsmith';
+            document.getElementById('summary').value = 'Results-driven Full Stack Software Engineer with 5+ years of experience building scalable web applications. Proficient in JavaScript, React, Node.js, and cloud technologies. Strong background in Agile development, microservices architecture, and CI/CD implementation. Proven track record of delivering high-quality solutions that improve user experience and drive business growth.';
+            document.getElementById('skills').value = 'JavaScript, TypeScript, React, Node.js, Python, Java, AWS, Docker, Kubernetes, MongoDB, PostgreSQL, REST API, GraphQL, Git, CI/CD, Agile, Scrum, Microservices, TDD, Jest';
+
+            document.getElementById('experienceContainer').innerHTML = '';
+            document.getElementById('educationContainer').innerHTML = '';
+            document.getElementById('projectsContainer').innerHTML = '';
+            document.getElementById('certificationsContainer').innerHTML = '';
+            experienceCount = 0;
+            educationCount = 0;
+            projectCount = 0;
+            certificationCount = 0;
+
+            addExperience();
+            document.getElementById('expTitle1').value = 'Senior Software Engineer';
+            document.getElementById('expCompany1').value = 'Tech Solutions Inc.';
+            document.getElementById('expDuration1').value = 'January 2021 - Present';
+            document.getElementById('expDesc1').value = `Developed and maintained microservices architecture using Node.js and Docker, improving system scalability by 40%
+Led frontend development using React and TypeScript, resulting in 25% improvement in application performance
+Implemented CI/CD pipelines using Jenkins and AWS CodePipeline, reducing deployment time by 60%
+Mentored junior developers and conducted code reviews to maintain high code quality standards
+Collaborated with product managers and designers in Agile sprints to deliver features on schedule`;
+
+            addExperience();
+            document.getElementById('expTitle2').value = 'Software Engineer';
+            document.getElementById('expCompany2').value = 'Digital Innovations LLC';
+            document.getElementById('expDuration2').value = 'June 2019 - December 2020';
+            document.getElementById('expDesc2').value = `Built RESTful APIs using Node.js and Express, serving 100K+ daily active users
+Designed and implemented database schemas using PostgreSQL and MongoDB
+Integrated third-party payment systems including Stripe and PayPal
+Improved application security by implementing JWT authentication and data encryption
+Participated in daily standups and sprint planning sessions following Scrum methodology`;
+
+            addEducation();
+            document.getElementById('eduDegree1').value = 'Bachelor of Science in Computer Science';
+            document.getElementById('eduInstitution1').value = 'University of California, Berkeley';
+            document.getElementById('eduYear1').value = '2019';
+            document.getElementById('eduGPA1').value = '3.8/4.0';
+
+            addProject();
+            document.getElementById('projName1').value = 'E-Commerce Platform';
+            document.getElementById('projTech1').value = 'React, Node.js, MongoDB, AWS, Stripe';
+            document.getElementById('projDesc1').value = 'Developed a full-stack e-commerce platform with user authentication, product catalog, shopping cart, and payment integration. Implemented responsive design and optimized for SEO. Deployed on AWS with auto-scaling capabilities.';
+
+            addCertification();
+            document.getElementById('certName1').value = 'AWS Certified Solutions Architect - Associate';
+            document.getElementById('certOrg1').value = 'Amazon Web Services';
+            document.getElementById('certYear1').value = '2022';
+
+            updateKeywordSuggestions();
+            updatePreview();
+            alert('Sample resume loaded! Try switching between different templates to see how your resume looks in each style.');
+        }
+
+        // Template Editor Functions
+        function openTemplateEditor() {
+            document.getElementById('templateEditorModal').style.display = 'block';
+            updateTemplateLivePreview();
+        }
+
+        function closeTemplateEditor() {
+            document.getElementById('templateEditorModal').style.display = 'none';
+        }
+
+        function updateTemplateLivePreview() {
+            const preview = document.getElementById('templatePreviewLive');
+            const headerColor = document.getElementById('headerColor').value;
+            const headerSize = document.getElementById('headerSize').value;
+            const sectionColor = document.getElementById('sectionColor').value;
+            const borderStyle = document.getElementById('borderStyle').value;
+            const bgColor = document.getElementById('bgColor').value;
+            const fontFamily = document.getElementById('fontFamily').value;
+            const textColor = document.getElementById('textColor').value;
+            const lineHeight = document.getElementById('lineHeight').value;
+
+            preview.style.backgroundColor = bgColor;
+            preview.style.fontFamily = fontFamily;
+            preview.style.lineHeight = lineHeight;
+
+            const h1 = preview.querySelector('h1');
+            h1.style.color = headerColor;
+            h1.style.fontSize = headerSize + 'px';
+            h1.style.fontFamily = fontFamily;
+
+            const h2 = preview.querySelector('h2');
+            h2.style.color = sectionColor;
+            h2.style.fontFamily = fontFamily;
+
+            // Apply border style
+            h2.style.borderBottom = 'none';
+            h2.style.borderLeft = 'none';
+            h2.style.backgroundColor = 'transparent';
+
+            if (borderStyle === 'border-bottom') {
+                h2.style.borderBottom = `2px solid ${sectionColor}`;
+                h2.style.paddingBottom = '5px';
+            } else if (borderStyle === 'border-left') {
+                h2.style.borderLeft = `4px solid ${sectionColor}`;
+                h2.style.paddingLeft = '10px';
+            } else if (borderStyle === 'background') {
+                h2.style.backgroundColor = sectionColor;
+                h2.style.color = bgColor === '#ffffff' ? '#000000' : '#ffffff';
+                h2.style.padding = '8px 10px';
+            } else if (borderStyle === 'underline') {
+                h2.style.borderBottom = `3px solid ${sectionColor}`;
+                h2.style.paddingBottom = '8px';
+            }
+
+            const p = preview.querySelector('p');
+            p.style.color = textColor;
+            p.style.fontFamily = fontFamily;
+        }
+
+        function saveCustomTemplate() {
+            const templateName = document.getElementById('templateName').value || 'Custom Template';
+            const headerColor = document.getElementById('headerColor').value;
+            const headerSize = document.getElementById('headerSize').value;
+            const sectionColor = document.getElementById('sectionColor').value;
+            const borderStyle = document.getElementById('borderStyle').value;
+            const bgColor = document.getElementById('bgColor').value;
+            const fontFamily = document.getElementById('fontFamily').value;
+            const textColor = document.getElementById('textColor').value;
+            const lineHeight = document.getElementById('lineHeight').value;
+
+            const customTemplate = {
+                name: templateName,
+                headerColor,
+                headerSize,
+                sectionColor,
+                borderStyle,
+                bgColor,
+                fontFamily,
+                textColor,
+                lineHeight
+            };
+
+            let customTemplates = JSON.parse(localStorage.getItem('customTemplates') || '[]');
+            customTemplates.push(customTemplate);
+            localStorage.setItem('customTemplates', JSON.stringify(customTemplates));
+
+            alert(`Template "${templateName}" saved successfully! You can now select it in the template dropdown.`);
+            closeTemplateEditor();
+            loadCustomTemplateOptions();
+        }
+
+        function loadCustomTemplateOptions() {
+            const customTemplates = JSON.parse(localStorage.getItem('customTemplates') || '[]');
+            const selector = document.getElementById('templateSelector');
+            
+            // Remove existing custom template options
+            const existingCustom = selector.querySelectorAll('[data-custom="true"]');
+            existingCustom.forEach(opt => opt.remove());
+
+            // Add new custom templates
+            customTemplates.forEach((template, index) => {
+                const option = document.createElement('option');
+                option.value = `custom${index}`;
+                option.textContent = `✨ ${template.name}`;
+                option.setAttribute('data-custom', 'true');
+                selector.appendChild(option);
+            });
+        }
+
+        window.addEventListener('load', function() {
+            loadCustomTemplateOptions();
+        });
+    </script>
+</body>
+</html>
